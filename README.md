@@ -8,6 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| v1.0.1 | [`v1.0.1`](https://github.com/chainguard-actions/peter-evans-s3-backup/tree/v1.0.1) | [`420b248`](https://github.com/peter-evans/s3-backup/commit/420b248af91d6a8c6852a640af51dc5cf3419fbe) |
 | v1.1.0 | [`v1.1.0`](https://github.com/chainguard-actions/peter-evans-s3-backup/tree/v1.1.0) | [`4f39c7d`](https://github.com/peter-evans/s3-backup/commit/4f39c7dab63c7666d6ba6722d7966e7d0655583c) |
 
 ## Privacy
