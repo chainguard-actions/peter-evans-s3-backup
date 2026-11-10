@@ -1,0 +1,70 @@
+name: Test mirror to local S3-compatible server
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Start a local S3-compatible server (moto)
+        run: |
+          set -e
+          python3 -m venv /tmp/s3venv || { python3 -m pip install --user virtualenv && python3 -m virtualenv /tmp/s3venv; }
+          /tmp/s3venv/bin/pip install --quiet 'moto[server]' boto3
+          nohup /tmp/s3venv/bin/moto_server -H 0.0.0.0 -p 9000 > /tmp/moto.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -s -o /dev/null http://127.0.0.1:9000/; then
+              echo "S3 server is up"
+              break
+            fi
+            sleep 1
+          done
+          curl -s -o /dev/null http://127.0.0.1:9000/ || { cat /tmp/moto.log; exit 1; }
+          cat > /tmp/s3.py <<'EOF'
+          import sys, boto3
+          s3 = boto3.client("s3", endpoint_url="http://127.0.0.1:9000",
+                            aws_access_key_id="testkey", aws_secret_access_key="testsecret",
+                            region_name="us-east-1")
+          cmd = sys.argv[1]
+          if cmd == "mb":
+              s3.create_bucket(Bucket=sys.argv[2])
+          elif cmd == "ls":
+              resp = s3.list_objects_v2(Bucket=sys.argv[2], Prefix=sys.argv[3])
+              for o in resp.get("Contents", []):
+                  print(o["Key"])
+          elif cmd == "cat":
+              sys.stdout.write(s3.get_object(Bucket=sys.argv[2], Key=sys.argv[3])["Body"].read().decode())
+          EOF
+          /tmp/s3venv/bin/python /tmp/s3.py mb backup-bucket
+      - id: action
+        uses: .
+        env:
+          ACCESS_KEY_ID: testkey
+          SECRET_ACCESS_KEY: testsecret
+          STORAGE_SERVICE_URL: http://127.0.0.1:9000
+          STORAGE_SERVICE_ALIAS: local
+          MIRROR_SOURCE: tests/fixtures/backup-src
+          MIRROR_TARGET: backup-bucket/at/some/path
+        with:
+          args: --overwrite --remove
+      - name: Assert objects were mirrored
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "success" ]; then
+            echo "FAIL: action did not succeed"
+            exit 1
+          fi
+          LISTING="$(/tmp/s3venv/bin/python /tmp/s3.py ls backup-bucket at/some/path/)"
+          echo "listing:"
+          echo "$LISTING"
+          echo "$LISTING" | grep -q "at/some/path/hello.txt" || { echo "FAIL: hello.txt not mirrored"; exit 1; }
+          echo "$LISTING" | grep -q "at/some/path/nested/data.txt" || { echo "FAIL: nested/data.txt not mirrored"; exit 1; }
+          CONTENT="$(/tmp/s3venv/bin/python /tmp/s3.py cat backup-bucket at/some/path/hello.txt)"
+          echo "content: $CONTENT"
+          if [ "$CONTENT" != "hello from s3-backup test" ]; then
+            echo "FAIL: unexpected content"
+            exit 1
+          fi
+          echo "PASS"
