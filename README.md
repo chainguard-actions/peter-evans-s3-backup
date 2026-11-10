@@ -12,6 +12,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v1.0.2 | [`v1.0.2`](https://github.com/chainguard-actions/peter-evans-s3-backup/tree/v1.0.2) | [`e5ff6b5`](https://github.com/peter-evans/s3-backup/commit/e5ff6b50200c15778d0778d4dc79d9215808c30b) | [`HARDENING.md`](https://github.com/chainguard-actions/peter-evans-s3-backup/blob/v1.0.2/HARDENING.md) |
 | v1.1.0 | [`v1.1.0`](https://github.com/chainguard-actions/peter-evans-s3-backup/tree/v1.1.0) | [`4f39c7d`](https://github.com/peter-evans/s3-backup/commit/4f39c7dab63c7666d6ba6722d7966e7d0655583c) | [`HARDENING.md`](https://github.com/chainguard-actions/peter-evans-s3-backup/blob/v1.1.0/HARDENING.md) |
 | v1.1.1 | [`v1.1.1`](https://github.com/chainguard-actions/peter-evans-s3-backup/tree/v1.1.1) | [`59efd33`](https://github.com/peter-evans/s3-backup/commit/59efd330705d92805a44894668b6cf5c10dc740e) | [`HARDENING.md`](https://github.com/chainguard-actions/peter-evans-s3-backup/blob/v1.1.1/HARDENING.md) |
+| v1.2.0 | [`v1.2.0`](https://github.com/chainguard-actions/peter-evans-s3-backup/tree/v1.2.0) | [`dad590e`](https://github.com/peter-evans/s3-backup/commit/dad590ef7dec70abb26fe5f74774b545c1b27e62) | [`HARDENING.md`](https://github.com/chainguard-actions/peter-evans-s3-backup/blob/v1.2.0/HARDENING.md) |
 
 ## Privacy
 
